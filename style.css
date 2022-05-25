@@ -39,3 +39,10 @@ background-image: url("background1.jpg");
 .modal-body {
     font-size: 18px;
 }
+canvas {
+    border-radius: 10px;
+    border-color: white;
+    border-width: 3px;
+    border-style: solid;
+    box-shadow: 5px 5px 5px whitesmoke;
+}
