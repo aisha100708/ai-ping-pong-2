@@ -24,7 +24,11 @@ var ball = {
     dx:3,
     dy:3
 }
-
+var game_status = "";
+function preload() {
+  ball_touch_paddel = loadSound("ball_touch_paddel.wav");
+  ball_missed = loadSound("missed.wav");
+}
 function setup(){
   var canvas =  createCanvas(700,600);
   canvas.parent("canvas");
@@ -42,14 +46,29 @@ function gotPoses(results) {
     console.log(results);
     rightWrist_x = results[0].pose.rightWrist.x;
     rightWrist_y = results[0].pose.rightWrist.y;
-    //rightWrist_score = 
+    rightWrist_score = results[0].pose.keypoints[10].score;
+    console.log("right wrist x = " + rightWrist_x + " | right wrist y = " + rightWrist_y + " | right wrist score " + rightWrist_score);
   }
 }
+function startGame() {
+  game_status = "start";
+  document.getElementById("status").innerHTML = "Game  has Loaded!";
+}
+function restart() {
+  pcscore = 0;
+  playerscore = 0;
+  loop();
+}
 function draw(){
-  
+  if (game_status == "start") {
  background(0); 
  image(video, 0, 0, 700, 600);
- 
+ if(rightWrist_score > 0.2)  {
+   fill("red");
+   stroke("red");
+   circle(rightWrist_x, rightWrist_y, 20);
+}
+
  fill("black");
  stroke("black");
  rect(680,0,20,700);
@@ -65,7 +84,7 @@ function draw(){
    fill(250,0,0);
     stroke(0,0,250);
     strokeWeight(0.5);
-   paddle1Y = mouseY; 
+   paddle1Y = rightWrist_y; 
    rect(paddle1X,paddle1Y,paddle1,paddle1Height,100);
    
    
@@ -85,6 +104,7 @@ function draw(){
    
    //function move call which in very important
     move();
+}
 }
 
 
@@ -137,11 +157,13 @@ function move(){
   if (ball.x-2.5*ball.r/2< 0){
   if (ball.y >= paddle1Y&& ball.y <= paddle1Y + paddle1Height) {
     ball.dx = -ball.dx+0.5; 
+    ball_touch_paddel.play();
   }
   else{
     pcscore++;
     reset();
     navigator.vibrate(100);
+    ball_missed.play();
   }
 }
 if(pcscore ==4){
@@ -151,8 +173,8 @@ if(pcscore ==4){
     fill("white");
     stroke("white");
     textSize(25)
-    text("Game Over!☹☹",width/2,height/2);
-    text("Reload The Page!",width/2,height/2+30)
+    text("Game Over! ☹☹",width/2,height/2);
+    text("Press 'Restart Game' Button To Play Again!",width/2,height/2+30)
     noLoop();
     pcscore = 0;
 }
